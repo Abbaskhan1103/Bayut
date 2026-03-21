@@ -1,0 +1,2 @@
+alter table events
+  add column if not exists category text not null default 'other';

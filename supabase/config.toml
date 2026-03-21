@@ -1,0 +1,7 @@
+[project]
+id = "bayt"
+
+[functions.youtube-live-check]
+# Every 10 minutes between 17:00–23:59 UTC (matches ~5pm–11pm AEST/AEDT)
+schedule = "*/10 7-13 * * *"
+verify_jwt = false
