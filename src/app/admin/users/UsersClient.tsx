@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { UserPlus, Trash2 } from "lucide-react";
+import { UserPlus, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Center { id: string; name: string }
@@ -19,6 +19,32 @@ export function UsersClient({ users, centers }: Props) {
   const [assigningUser, setAssigningUser] = useState<User | null>(null);
   const [selectedCenter, setSelectedCenter] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [showCreate, setShowCreate] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [createError, setCreateError] = useState("");
+  const [creating, setCreating] = useState(false);
+
+  async function createUser() {
+    setCreateError("");
+    setCreating(true);
+    const res = await fetch("/api/admin/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: newEmail, password: newPassword }),
+    });
+    const data = await res.json();
+    setCreating(false);
+    if (!res.ok) {
+      setCreateError(data.error ?? "Failed to create user");
+      return;
+    }
+    setShowCreate(false);
+    setNewEmail("");
+    setNewPassword("");
+    router.refresh();
+  }
 
   async function assignRole() {
     if (!assigningUser || !selectedCenter) return;
@@ -46,6 +72,12 @@ export function UsersClient({ users, centers }: Props) {
 
   return (
     <>
+      <div className="flex justify-end">
+        <Button onClick={() => { setShowCreate(true); setCreateError(""); }} className="flex items-center gap-2">
+          <Plus className="w-4 h-4" /> Create User
+        </Button>
+      </div>
+
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] overflow-hidden">
         <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -97,6 +129,38 @@ export function UsersClient({ users, centers }: Props) {
         </table>
         </div>
       </div>
+
+      {/* Create user modal */}
+      {showCreate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6 w-full max-w-sm flex flex-col gap-4 shadow-2xl">
+            <h2 className="font-lora text-lg font-semibold text-[var(--text)]">Create User</h2>
+            <div className="flex flex-col gap-3">
+              <input
+                type="email"
+                placeholder="Email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-sm text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]"
+              />
+              <input
+                type="password"
+                placeholder="Password (min 8 characters)"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-sm text-[var(--text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]"
+              />
+              {createError && <p className="text-xs text-red-400">{createError}</p>}
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={createUser} disabled={!newEmail || !newPassword || creating} className="flex-1">
+                {creating ? "Creating..." : "Create"}
+              </Button>
+              <Button variant="secondary" onClick={() => setShowCreate(false)}>Cancel</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Assign modal */}
       {assigningUser && (
