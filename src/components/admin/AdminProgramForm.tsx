@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,22 +49,14 @@ function generateDates(startDate: string, endDate: string, mode: RepeatMode, cus
 
 interface Center { id: string; name: string }
 
-export function AdminProgramForm() {
+interface Props {
+  centers: Center[];
+}
+
+export function AdminProgramForm({ centers }: Props) {
   const router = useRouter();
 
-  const [centers, setCenters] = useState<Center[]>([]);
-  const [centerId, setCenterId] = useState("");
-
-  useEffect(() => {
-    fetch("/api/admin/centers")
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setCenters(data);
-          if (data.length > 0) setCenterId(data[0].id);
-        }
-      });
-  }, []);
+  const [centerId, setCenterId] = useState(centers[0]?.id ?? "");
   const [form, setForm] = useState({
     title: "",
     description: "",
