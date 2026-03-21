@@ -8,11 +8,11 @@ export default async function AdminOverviewPage() {
   const db = createServiceClient() as any;
 
   const [
-    { count: centerCount },
-    { count: programCount },
+    { count: centerCount, error: e1 },
+    { count: programCount, error: e2 },
     {},
-    { data: centers },
-    { data: { users } },
+    { data: centers, error: e3 },
+    { data: adminData, error: e4 },
   ] = await Promise.all([
     db.from("centers").select("*", { count: "exact", head: true }),
     db.from("events").select("*", { count: "exact", head: true }),
@@ -20,6 +20,13 @@ export default async function AdminOverviewPage() {
     db.from("centers").select("subscription_status"),
     db.auth.admin.listUsers(),
   ]);
+
+  if (e1) console.error("[admin/overview] centers count:", e1);
+  if (e2) console.error("[admin/overview] events count:", e2);
+  if (e3) console.error("[admin/overview] centers data:", e3);
+  if (e4) console.error("[admin/overview] listUsers:", e4);
+
+  const users = adminData?.users ?? [];
 
   const activeCount = (centers ?? []).filter(
     (c: { subscription_status: string }) =>
@@ -29,7 +36,7 @@ export default async function AdminOverviewPage() {
   const stats = [
     { label: "Centers", value: centerCount ?? 0, icon: Building2, color: "text-[#C9A84C]", bg: "bg-[#C9A84C]/10" },
     { label: "Programs", value: programCount ?? 0, icon: CalendarDays, color: "text-blue-400", bg: "bg-blue-400/10" },
-    { label: "Users", value: users?.length ?? 0, icon: Users, color: "text-purple-400", bg: "bg-purple-400/10" },
+    { label: "Users", value: users.length, icon: Users, color: "text-purple-400", bg: "bg-purple-400/10" },
     { label: "Active / Trialing", value: activeCount, icon: CheckCircle, color: "text-emerald-400", bg: "bg-emerald-400/10" },
   ];
 
