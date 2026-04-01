@@ -14,7 +14,7 @@ function isValidOrigin(request: NextRequest): boolean {
   }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // CSRF: reject cross-origin mutating requests on API routes.

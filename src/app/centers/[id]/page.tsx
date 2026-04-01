@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 
 export const revalidate = 3600;
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 export async function generateStaticParams() {
-  const supabase = await createClient();
+  // Use service client — no request context (cookies) available at build time
+  const supabase = createServiceClient();
   const { data } = await supabase.from("public_centers").select("id");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data ?? []).map((c: any) => ({ id: c.id as string }));
