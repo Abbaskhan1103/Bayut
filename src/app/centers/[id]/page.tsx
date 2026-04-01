@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 export const revalidate = 3600;
-import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { createPublicClient, createServiceClient } from "@/lib/supabase/server";
 
 export async function generateStaticParams() {
   // Use service client — no request context (cookies) available at build time
@@ -26,7 +26,7 @@ interface Props {
 
 export default async function CenterPage({ params }: Props) {
   const { id } = await params;
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   const [{ data: center }, { data: programs }, hijriOffset] = await Promise.all([
     supabase.from("public_centers").select("id, name, suburb, address, lat, lng, phone, email, website, logo_url, youtube_channel_id, youtube_url, instagram_url, facebook_url, color_hex, bank_name, bsb, account_number, account_name, created_at").eq("id", id).single(),

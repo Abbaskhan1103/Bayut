@@ -1,9 +1,9 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
 import { cache } from "react";
 
 export const getHijriOffset = cache(async (): Promise<number> => {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data } = await (supabase as any)
       .from("app_settings")
