@@ -47,6 +47,7 @@ export function CenterCard({
               width={96}
               height={96}
               sizes="48px"
+              quality={90}
               className="w-full h-full object-cover"
             />
           ) : (

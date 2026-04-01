@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   icons: [
     { rel: "icon", url: "/bayut-favicon-light.svg", media: "(prefers-color-scheme: light)" },
     { rel: "icon", url: "/bayut-favicon-dark.svg", media: "(prefers-color-scheme: dark)" },
+    { rel: "apple-touch-icon", url: "/icons/icon-192.png" },
   ],
 };
 

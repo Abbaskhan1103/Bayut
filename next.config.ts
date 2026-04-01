@@ -66,6 +66,8 @@ const nextConfig: NextConfig = {
     root: path.resolve(__dirname),
   },
   images: {
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: "https",
