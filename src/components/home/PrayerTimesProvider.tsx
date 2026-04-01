@@ -21,13 +21,23 @@ const PrayerTimesContext = createContext<PrayerTimesContextValue>({
   msUntil: 0,
 });
 
-export function PrayerTimesProvider({ children }: { children: React.ReactNode }) {
-  const [times, setTimes] = useState<PrayerTimesResult | null>(null);
-  const nextRef = useRef<NextPrayerResult | null>(null);
-  const [next, setNext] = useState<NextPrayerResult | null>(null);
-  const [msUntil, setMsUntil] = useState(0);
+interface ProviderProps {
+  children: React.ReactNode;
+  // Server-computed initial values eliminate the first-paint flash
+  initialTimes?: PrayerTimesResult;
+  initialNext?: NextPrayerResult | null;
+}
+
+export function PrayerTimesProvider({ children, initialTimes, initialNext }: ProviderProps) {
+  const [times, setTimes] = useState<PrayerTimesResult | null>(initialTimes ?? null);
+  const nextRef = useRef<NextPrayerResult | null>(initialNext ?? null);
+  const [next, setNext] = useState<NextPrayerResult | null>(initialNext ?? null);
+  const [msUntil, setMsUntil] = useState(() =>
+    initialNext ? initialNext.time.getTime() - Date.now() : 0
+  );
 
   useEffect(() => {
+    // Re-compute on client to correct for any server/client clock skew
     const now = new Date();
     const t = getPrayerTimes(now);
     const n = getNextPrayer(now);

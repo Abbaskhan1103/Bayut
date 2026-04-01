@@ -6,9 +6,15 @@ import { WhatsOnSearch } from "@/components/home/WhatsOnSearch";
 import { PrayerTimesProvider } from "@/components/home/PrayerTimesProvider";
 import { getHijriOffset } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
+import { getPrayerTimes, getNextPrayer } from "@/lib/prayer/prayerTimes";
 
 export default async function HomePage() {
   const hijriOffset = await getHijriOffset();
+
+  // Compute prayer times server-side to avoid first-paint flash on the client
+  const now = new Date();
+  const initialTimes = getPrayerTimes(now);
+  const initialNext = getNextPrayer(now);
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -32,7 +38,7 @@ export default async function HomePage() {
       <HijriDate offset={hijriOffset} />
 
       {/* Single provider computes prayer times once for both children */}
-      <PrayerTimesProvider>
+      <PrayerTimesProvider initialTimes={initialTimes} initialNext={initialNext}>
         {/* Next prayer countdown hero */}
         <PrayerCountdown />
 

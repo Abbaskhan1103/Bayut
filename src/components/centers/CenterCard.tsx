@@ -44,8 +44,9 @@ export function CenterCard({
             <Image
               src={center.logo_url}
               alt={center.name}
-              width={48}
-              height={48}
+              width={96}
+              height={96}
+              sizes="48px"
               className="w-full h-full object-cover"
             />
           ) : (

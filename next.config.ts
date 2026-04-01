@@ -1,5 +1,26 @@
 import type { NextConfig } from "next";
 import path from "path";
+import withPWAInit from "@ducanh2912/next-pwa";
+
+const withPWA = withPWAInit({
+  dest: "public",
+  cacheOnFrontEndNav: true,
+  aggressiveFrontEndNavCaching: true,
+  reloadOnOnline: true,
+  workboxOptions: {
+    disableDevLogs: true,
+    runtimeCaching: [
+      {
+        urlPattern: /\/api\/prayer-times/,
+        handler: "StaleWhileRevalidate",
+        options: {
+          cacheName: "prayer-times-cache",
+          expiration: { maxAgeSeconds: 60 * 60 * 6 },
+        },
+      },
+    ],
+  },
+});
 
 const securityHeaders = [
   // Prevent clickjacking
@@ -33,6 +54,8 @@ const securityHeaders = [
       "frame-src https://www.youtube.com https://js.stripe.com https://hooks.stripe.com",
       // Media: YouTube streams
       "media-src 'self' https://www.youtube.com",
+      // Service worker scripts (same origin only)
+      "worker-src 'self'",
     ].join("; "),
   },
 ];
@@ -64,4 +87,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);

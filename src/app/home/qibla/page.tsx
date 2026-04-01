@@ -22,8 +22,11 @@ function bearingLabel(deg: number): string {
   return dirs[Math.round(deg / 45) % 8];
 }
 
+// Pre-computed Melbourne CBD → Kaaba bearing (static fallback)
+const MELBOURNE_QIBLA = calcBearing(MELBOURNE.lat, MELBOURNE.lng, KAABA.lat, KAABA.lng);
+
 export default function QiblaPage() {
-  const [qiblaBearing, setQiblaBearing] = useState<number | null>(null);
+  const [qiblaBearing, setQiblaBearing] = useState<number>(MELBOURNE_QIBLA);
   const [deviceHeading, setDeviceHeading] = useState<number | null>(null);
   const [locationName, setLocationName] = useState("Melbourne");
   const [permissionDenied, setPermissionDenied] = useState(false);
@@ -96,10 +99,7 @@ export default function QiblaPage() {
   }, []);
 
   // Angle to rotate the needle: qibla bearing relative to device heading
-  const needleAngle =
-    qiblaBearing !== null && deviceHeading !== null
-      ? qiblaBearing - deviceHeading
-      : qiblaBearing ?? 0;
+  const needleAngle = deviceHeading !== null ? qiblaBearing - deviceHeading : qiblaBearing;
 
   const isLive = deviceHeading !== null;
 
@@ -210,8 +210,7 @@ export default function QiblaPage() {
         </div>
 
         {/* Bearing info */}
-        {qiblaBearing !== null && (
-          <div className="flex flex-col items-center gap-1">
+        <div className="flex flex-col items-center gap-1">
             <div className="flex items-baseline gap-2">
               <span className="font-mono text-5xl font-bold text-[#C9A84C]">
                 {Math.round(qiblaBearing)}°
@@ -222,7 +221,6 @@ export default function QiblaPage() {
             </div>
             <p className="text-sm text-[var(--subtext)]">True bearing to the Kaaba</p>
           </div>
-        )}
 
         {/* Status badge */}
         <div className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm ${

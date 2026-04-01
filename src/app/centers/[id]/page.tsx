@@ -1,7 +1,14 @@
 import { notFound } from "next/navigation";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 import { createClient } from "@/lib/supabase/server";
+
+export async function generateStaticParams() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("public_centers").select("id");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data ?? []).map((c: any) => ({ id: c.id as string }));
+}
 import Image from "next/image";
 import { Navigation } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -53,7 +60,7 @@ export default async function CenterPage({ params }: Props) {
           style={{ backgroundColor: (center as Center).logo_url ? "transparent" : ((center as Center).color_hex ?? "#1E2D52") + "33" }}
         >
           {(center as Center).logo_url ? (
-            <Image src={(center as Center).logo_url!} alt={(center as Center).name} width={56} height={56} className="w-full h-full object-cover" />
+            <Image src={(center as Center).logo_url!} alt={(center as Center).name} width={112} height={112} sizes="56px" className="w-full h-full object-cover" />
           ) : "🕌"}
         </div>
         <div className="flex-1 min-w-0">

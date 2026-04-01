@@ -22,7 +22,10 @@ export const metadata: Metadata = {
   description:
     "Connecting Melbourne's Shia Muslim community to Islamic centres, events, prayer times, and ibadah tools.",
   manifest: "/manifest.json",
-  icons: { icon: "/bayut-favicon-light.svg" },
+  icons: [
+    { rel: "icon", url: "/bayut-favicon-light.svg", media: "(prefers-color-scheme: light)" },
+    { rel: "icon", url: "/bayut-favicon-dark.svg", media: "(prefers-color-scheme: dark)" },
+  ],
 };
 
 export const viewport: Viewport = {
